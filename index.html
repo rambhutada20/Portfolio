@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ram Bhutada | Quantitative Finance Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0d0a1f;
+    --bg-mid: #120f2d;
+    --purple-1: #6b21e8;
+    --purple-2: #9333ea;
+    --violet: #7c3aed;
+    --pink: #c026d3;
+    --accent: #a855f7;
+    --accent-light: #d8b4fe;
+    --blue: #3b82f6;
+    --blue-light: #93c5fd;
+    --white: #ffffff;
+    --gray-1: #e2d9f3;
+    --gray-2: #a89ec0;
+    --gray-3: #6b6585;
+    --glass: rgba(255,255,255,0.05);
+    --glass-border: rgba(255,255,255,0.1);
+    --card: rgba(255,255,255,0.04);
+    --card-hover: rgba(255,255,255,0.08);
+    --gradient: linear-gradient(135deg, var(--purple-1), var(--pink));
+    --gradient-soft: linear-gradient(135deg, #1a0f3a, #2d1060);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--gray-1);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 4rem;
+    background: rgba(13,10,31,0.7);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .nav-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1.25rem; color: var(--white);
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--gray-2); text-decoration: none; font-size: 0.9rem;
+    font-weight: 500; transition: color 0.2s;
+    position: relative; padding-bottom: 4px;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 100%;
+    height: 2px; background: var(--gradient);
+    transition: right 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { right: 0; }
+  .nav-links a.active { color: var(--white); }
+  .nav-links a.active::after { right: 0; }
+
+  /* CANVAS BG */
+  #canvas-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+  }
+
+  /* HERO */
+  #home {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative; z-index: 1;
+  }
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto; width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4rem;
+  }
+  .hero-text { flex: 1; }
+  .hero-eyebrow {
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .hero-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 3.8rem);
+    font-weight: 700; color: var(--white);
+    line-height: 1.1; margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+  }
+  .hero-title {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--accent-light); font-weight: 500; margin-bottom: 1.5rem;
+    min-height: 2rem;
+  }
+  .hero-desc {
+    color: var(--gray-2); font-size: 0.95rem; max-width: 520px;
+    margin-bottom: 2rem; line-height: 1.75;
+  }
+  .hero-cta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    background: var(--gradient);
+    color: white; font-weight: 600; font-size: 0.9rem;
+    border-radius: 50px; text-decoration: none;
+    border: none; cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+  .hero-social { display: flex; gap: 0.75rem; }
+  .social-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; color: var(--gray-2);
+    font-size: 1rem; transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .social-icon:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  /* PHOTO */
+  .hero-photo { flex-shrink: 0; }
+  .photo-ring {
+    width: 300px; height: 300px; border-radius: 50%;
+    border: 2px solid transparent;
+    background: linear-gradient(var(--bg-deep), var(--bg-deep)) padding-box,
+                var(--gradient) border-box;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    box-shadow: 0 0 60px rgba(168,85,247,0.3);
+    animation: float 4s ease-in-out infinite;
+  }
+  .photo-inner {
+    width: 272px; height: 272px; border-radius: 50%;
+    background: var(--gradient-soft);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .photo-placeholder {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 5rem; font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* SECTIONS COMMON */
+  section { position: relative; z-index: 1; }
+  .section-wrap {
+    max-width: 1200px; margin: 0 auto;
+    padding: 5rem 4rem;
+  }
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700;
+    color: var(--white); margin-bottom: 3rem;
+    letter-spacing: -0.02em;
+  }
+  .divider {
+    width: 60px; height: 3px;
+    background: var(--gradient);
+    border-radius: 2px; margin-bottom: 3rem;
+  }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ABOUT */
+  #about { background: var(--bg-mid); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: start;
+  }
+  .about-text p { color: var(--gray-2); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.8; }
+  .about-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 1.5rem;
+    text-align: center; transition: background 0.2s;
+  }
+  .stat-card:hover { background: var(--card-hover); }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem; font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--gray-3); margin-top: 0.25rem; }
+
+  /* SKILLS */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .skill-group {
+    background: var(--card); border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 1.5rem;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .skill-group:hover { background: var(--card-hover); border-color: rgba(168,85,247,0.3); }
+  .skill-group-title {
+    font-weight: 700; color: var(--white); margin-bottom: 1rem;
+    font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .skill-group-title .icon { font-size: 1.2rem; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tag {
+    font-size: 0.75rem; padding: 0.3rem 0.75rem; border-radius: 50px;
+    background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);
+    color: var(--accent-light); font-weight: 500;
+  }
+
+  /* EXPERIENCE */
+  #experience { background: var(--bg-mid); }
+  .timeline { position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, var(--purple-1), transparent);
+  }
+  .timeline-item { padding-left: 2.5rem; margin-bottom: 3rem; position: relative; }
+  .timeline-dot {
+    position: absolute; left: -5px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--gradient);
+    box-shadow: 0 0 12px rgba(168,85,247,0.6);
+  }
+  .exp-card {
+    background: var(--card); border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 1.75rem;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .exp-card:hover { background: var(--card-hover); border-color: rgba(168,85,247,0.3); }
+  .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem; }
+  .exp-role { font-weight: 700; color: var(--white); font-size: 1rem; }
+  .exp-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .exp-org { color: var(--accent-light); font-size: 0.85rem; margin-bottom: 1rem; font-weight: 500; }
+  .exp-bullets { list-style: none; }
+  .exp-bullets li {
+    font-size: 0.875rem; color: var(--gray-2); padding: 0.35rem 0;
+    padding-left: 1.25rem; position: relative; line-height: 1.7;
+  }
+  .exp-bullets li::before {
+    content: '\25B8'; position: absolute; left: 0;
+    color: var(--accent); font-size: 0.7rem; top: 0.45rem;
+  }
+
+  /* PROJECTS */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+  .project-card {
+    background: var(--card); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 2rem;
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .project-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--gradient);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .project-card:hover { background: var(--card-hover); border-color: rgba(168,85,247,0.3); transform: translateY(-4px); }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; font-size: 1rem; }
+  .project-tech { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .project-bullets { list-style: none; }
+  .project-bullets li {
+    font-size: 0.85rem; color: var(--gray-2); padding: 0.3rem 0;
+    padding-left: 1.25rem; position: relative; line-height: 1.65;
+  }
+  .project-bullets li::before {
+    content: '\2192'; position: absolute; left: 0;
+    color: var(--accent); font-size: 0.75rem; top: 0.3rem;
+  }
+
+  /* EDUCATION */
+  #education { background: var(--bg-mid); }
+  .edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .edu-card {
+    background: var(--card); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 2rem; transition: all 0.2s;
+  }
+  .edu-card:hover { background: var(--card-hover); border-color: rgba(168,85,247,0.3); }
+  .edu-degree { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--white); margin-bottom: 0.35rem; font-size: 1rem; }
+  .edu-school { color: var(--accent-light); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .edu-meta { font-size: 0.8rem; color: var(--gray-3); margin-bottom: 0.75rem; }
+  .gpa-badge {
+    display: inline-block; padding: 0.25rem 0.75rem;
+    background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--accent-light);
+  }
+
+  /* CERTS */
+  .certs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .cert-item {
+    background: var(--card); border: 1px solid var(--glass-border);
+    border-radius: 12px; padding: 1.25rem 1.5rem;
+    display: flex; align-items: flex-start; gap: 1rem;
+    transition: all 0.2s;
+  }
+  .cert-item:hover { background: var(--card-hover); border-color: rgba(168,85,247,0.3); }
+  .cert-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--gradient); display: flex; align-items: center;
+    justify-content: center; font-size: 1rem; flex-shrink: 0;
+  }
+  .cert-name { font-size: 0.875rem; font-weight: 600; color: var(--white); }
+  .cert-sub { font-size: 0.775rem; color: var(--gray-3); margin-top: 0.2rem; }
+
+  /* COURSEWORK */
+  .course-tags { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .course-tag {
+    padding: 0.5rem 1.1rem; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--glass-border);
+    font-size: 0.825rem; color: var(--gray-1); font-weight: 500;
+    transition: all 0.2s;
+  }
+  .course-tag:hover {
+    background: rgba(168,85,247,0.1);
+    border-color: rgba(168,85,247,0.4);
+    color: var(--accent-light);
+  }
+
+  /* CONTACT */
+  #contact { background: var(--bg-mid); }
+  .contact-inner { text-align: center; max-width: 680px; margin: 0 auto; }
+  .contact-inner p { color: var(--gray-2); margin-bottom: 2.5rem; font-size: 0.95rem; }
+  .contact-links { display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap; }
+  .contact-link {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1.75rem; border-radius: 50px;
+    font-size: 0.875rem; font-weight: 600; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .contact-link.primary {
+    background: var(--gradient); color: white;
+  }
+  .contact-link.ghost {
+    border: 1px solid var(--glass-border); color: var(--gray-1);
+    background: var(--glass); backdrop-filter: blur(8px);
+  }
+  .contact-link:hover { transform: translateY(-3px); opacity: 0.9; }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 2rem;
+    font-size: 0.8rem; color: var(--gray-3);
+    border-top: 1px solid var(--glass-border);
+    position: relative; z-index: 1;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    .hero-inner { flex-direction: column-reverse; text-align: center; }
+    .hero-cta { justify-content: center; }
+    .about-grid { grid-template-columns: 1fr; }
+    .edu-grid { grid-template-columns: 1fr; }
+    .section-wrap { padding: 4rem 2rem; }
+    .nav-links { gap: 1.5rem; }
+    .photo-ring { width: 220px; height: 220px; }
+    .photo-inner { width: 196px; height: 196px; }
+    .photo-placeholder { font-size: 3.5rem; }
+  }
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Ram<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="hero-eyebrow">Quantitative Finance &middot; Portfolio Management</p>
+      <h1 class="hero-name">Ram Bhutada</h1>
+      <div class="hero-title" id="typewriter"></div>
+      <p class="hero-desc">
+        MS Finance (STEM) candidate at IIT Stuart School of Business with GPA 3.88.
+        Specializing in equity factor research, options pricing, derivatives, and portfolio risk &mdash;
+        translating complex financial models into actionable investment insights.
+      </p>
+      <div class="hero-cta">
+        <a href="mailto:rbhutada@hawk.illinoistech.edu" class="btn-primary">
+          &#9993; Get In Touch
+        </a>
+        <div class="hero-social">
+          <a href="https://www.linkedin.com/in/ram-bhutada-156695246/" target="_blank" class="social-icon" title="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://github.com/rambhutada20" target="_blank" class="social-icon" title="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </a>
+          <a href="mailto:rbhutada@hawk.illinoistech.edu" class="social-icon" title="Email">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <div class="photo-ring">
+        <div class="photo-inner">
+          <span class="photo-placeholder">RB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrap">
+    <p class="section-label reveal">About Me</p>
+    <h2 class="section-title reveal">Who I Am</h2>
+    <div class="divider reveal"></div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm a quantitative finance professional and MS Finance (STEM) candidate at Illinois Institute of Technology's Stuart School of Business, with a GPA of 3.88/4.00.</p>
+        <p>My work sits at the intersection of rigorous financial modeling and data-driven decision-making &mdash; covering equity factor research, options pricing, statistical arbitrage, and portfolio risk analysis.</p>
+        <p>I've built Python-driven quantitative models, managed investment operations across 500+ client accounts, and placed in the top 10 among 100+ North American graduate programs in the CQA Portfolio Management Competition.</p>
+        <p>Target roles: <strong style="color: var(--accent-light)">Quantitative Analyst | Investment Operations | Portfolio Risk | Derivatives Research</strong></p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat-card">
+          <div class="stat-num">3.88</div>
+          <div class="stat-label">GPA / 4.00 &middot; IIT Stuart</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">Top 10</div>
+          <div class="stat-label">CQA Portfolio Competition (100+ programs)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">500+</div>
+          <div class="stat-label">Client Accounts Reconciled Daily</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1.42</div>
+          <div class="stat-label">Sharpe Ratio &mdash; Pairs Trading Backtest</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-wrap">
+    <p class="section-label reveal">Capabilities</p>
+    <h2 class="section-title reveal">Technical Skills</h2>
+    <div class="divider reveal"></div>
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <div class="skill-group-title"><span class="icon">&#x1F40D;</span> Programming &amp; Analytics</div>
+        <div class="skill-tags">
+          <span class="tag">Python</span>
+          <span class="tag">pandas</span>
+          <span class="tag">numpy</span>
+          <span class="tag">scipy</span>
+          <span class="tag">statsmodels</span>
+          <span class="tag">matplotlib</span>
+          <span class="tag">SQL</span>
+          <span class="tag">Excel (Advanced)</span>
+          <span class="tag">Power BI</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title"><span class="icon">&#x1F4CA;</span> Investment Methods</div>
+        <div class="skill-tags">
+          <span class="tag">Equity Factor Research</span>
+          <span class="tag">Portfolio Risk Analysis</span>
+          <span class="tag">Quantitative Strategy</span>
+          <span class="tag">Financial Modeling</span>
+          <span class="tag">Performance Attribution</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title"><span class="icon">&#x1F4C8;</span> Instruments</div>
+        <div class="skill-tags">
+          <span class="tag">Equities</span>
+          <span class="tag">Fixed Income</span>
+          <span class="tag">Bonds &amp; T-Bills</span>
+          <span class="tag">Derivatives</span>
+          <span class="tag">Futures &amp; Options</span>
+          <span class="tag">ETFs</span>
+          <span class="tag">Credit Instruments</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title"><span class="icon">&#x1F5A5;&#xFE0F;</span> Platforms</div>
+        <div class="skill-tags">
+          <span class="tag">Bloomberg Terminal</span>
+          <span class="tag">ETNA Trading Platform</span>
+          <span class="tag">yfinance</span>
+          <span class="tag">Jupyter Notebook</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-wrap">
+    <p class="section-label reveal">Career</p>
+    <h2 class="section-title reveal">Work Experience</h2>
+    <div class="divider reveal"></div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="exp-card">
+          <div class="exp-header">
+            <span class="exp-role">Teaching Assistant &mdash; Futures, Options &amp; OTC Derivatives</span>
+            <span class="exp-date">Fall 2025</span>
+          </div>
+          <div class="exp-org">Illinois Institute of Technology, Stuart School of Business &middot; Chicago, IL</div>
+          <ul class="exp-bullets">
+            <li>Facilitated weekly office hours for a <strong>40-student graduate cohort</strong> enrolled in an advanced derivatives course, resolving conceptual gaps across futures pricing, options mechanics, and OTC instrument structures.</li>
+            <li>Guided students through <strong>live multi-leg options trading simulations</strong> on ETNA &mdash; coaching covered calls, iron condors, and straddles under simulated market conditions.</li>
+            <li>Designed and delivered targeted remedial lectures on <strong>delta hedging, options Greeks (&Delta;, &Gamma;, &Theta;, Vega), and futures pricing mathematics</strong> &mdash; breaking down quantitative frameworks into intuition-first explanations.</li>
+            <li>Co-evaluated midterm and final examinations assessing <strong>options payoff construction, Greeks-based sensitivity analysis, and futures margin calculations</strong>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="exp-card">
+          <div class="exp-header">
+            <span class="exp-role">Investment Operations Analyst</span>
+            <span class="exp-date">Jun 2023 &ndash; Nov 2023</span>
+          </div>
+          <div class="exp-org">BIIS &mdash; Investment Advisory Firm &middot; Akola, India</div>
+          <ul class="exp-bullets">
+            <li>Performed daily reconciliation across <strong>500+ client investment accounts</strong>, resolving position breaks, settlement mismatches, and data discrepancies before end-of-day reporting cutoffs.</li>
+            <li>Monitored <strong>allocation drift for 20+ advisor-managed portfolios</strong>, flagging discrepancies ahead of reporting deadlines and reducing correction requests returned to the senior ops team.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="exp-card">
+          <div class="exp-header">
+            <span class="exp-role">Junior Trading Operations Analyst</span>
+            <span class="exp-date">Jun 2022 &ndash; Jul 2022</span>
+          </div>
+          <div class="exp-org">Market Lakshmi &mdash; Brokerage &amp; Investment Services &middot; Kanpur, India</div>
+          <ul class="exp-bullets">
+            <li>Monitored <strong>trade exceptions during live market hours</strong> &mdash; ticket verification, NAV reconciliation, and trade data checks in Excel across a high-volume brokerage environment.</li>
+            <li>Rebuilt the desk's exception log from scratch, <strong>reducing average break-to-resolution time from 4+ hours to ~90 minutes</strong> by standardizing documentation and escalation format.</li>
+            <li>Ran weekly performance and drift reports for <strong>15+ client accounts</strong>; identified 3 recurring data errors incorporated as permanent quality checks.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-wrap">
+    <p class="section-label reveal">Work</p>
+    <h2 class="section-title reveal">Quantitative Projects</h2>
+    <div class="divider reveal"></div>
+    <div class="projects-grid">
+      <div class="project-card reveal">
+        <div class="project-name">Multi-Factor Equity Selection Model</div>
+        <div class="project-tech">
+          <span class="tag">Python</span><span class="tag">pandas</span><span class="tag">numpy</span>
+        </div>
+        <ul class="project-bullets">
+          <li>Optimized a 3-factor model (P/B, EV/EBITDA, P/E) via 100-point grid search &mdash; arriving at <strong>46% P/B and 54% EV/EBITDA</strong> as the optimal weighting, achieving IC of 0.72&ndash;0.74 across all 4 cap segments.</li>
+          <li>Applied z-score normalization and sector-neutral transformations, sustaining <strong>IC consistency of 0.57&ndash;0.74</strong> across all cap segments; Mid Cap identified as the strongest standalone value signal at 91% P/B weighting.</li>
+        </ul>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-name">Portfolio Tail Risk &amp; Stress Correlation Analyzer</div>
+        <div class="project-tech">
+          <span class="tag">Python</span><span class="tag">yfinance</span><span class="tag">pandas</span>
+        </div>
+        <ul class="project-bullets">
+          <li>Built a multi-asset stress-testing framework across 5 ETFs tracking correlation shifts over 2008 crisis, COVID-19, and 2022 rate hike cycle &mdash; finding <strong>bond-equity correlation turned positive in 2022</strong>, invalidating standard 60/40 hedging assumptions.</li>
+          <li>Computed rolling VaR and CVaR at <strong>95% and 99% confidence</strong> with equity drawdown overlays; packaged outputs as desk-level summaries for committee presentation.</li>
+        </ul>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-name">Relative Value Arbitrage &mdash; Statistical Pair Trading</div>
+        <div class="project-tech">
+          <span class="tag">Python</span><span class="tag">Excel</span>
+        </div>
+        <ul class="project-bullets">
+          <li>Ran Johansen and Engle-Granger cointegration tests across <strong>50+ S&amp;P 500 pairs</strong>, filtering to candidates with &gt;90% historical cointegration stability as the entry threshold.</li>
+          <li>Backtested on 2018&ndash;2023 daily data ($10K capital per pair): <strong>annualized Sharpe ratio 1.42, max drawdown &lt;6%, win rate &gt;63%</strong> on trades lasting 3&ndash;10 days.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-wrap">
+    <p class="section-label reveal">Academics</p>
+    <h2 class="section-title reveal">Education</h2>
+    <div class="divider reveal"></div>
+    <div class="edu-grid reveal">
+      <div class="edu-card">
+        <div class="edu-degree">Master of Science in Finance (STEM)</div>
+        <div class="edu-school">Illinois Institute of Technology, Stuart School of Business</div>
+        <div class="edu-meta">Aug 2024 &ndash; May 2026 &middot; Chicago, IL</div>
+        <span class="gpa-badge">GPA: 3.88 / 4.00</span>
+      </div>
+      <div class="edu-card">
+        <div class="edu-degree">Bachelor of Engineering in Information Technology</div>
+        <div class="edu-school">Thadomal Shahani Engineering College, University of Mumbai</div>
+        <div class="edu-meta">Aug 2020 &ndash; Jun 2024 &middot; Mumbai, India</div>
+        <span class="gpa-badge">GPA: 8.94 / 10.00</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem;">
+      <p class="section-label reveal">Honors &amp; Certifications</p>
+      <div style="margin-top: 1.25rem;" class="certs-grid reveal">
+        <div class="cert-item">
+          <div class="cert-icon">&#x1F3C6;</div>
+          <div>
+            <div class="cert-name">Bloomberg Market Concepts (BMC)</div>
+            <div class="cert-sub">Bloomberg Certification</div>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="cert-icon">&#x1F331;</div>
+          <div>
+            <div class="cert-name">Bloomberg ESG</div>
+            <div class="cert-sub">Bloomberg Certification</div>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="cert-icon">&#x1F947;</div>
+          <div>
+            <div class="cert-name">Top 10 &mdash; CQA Portfolio Management Competition</div>
+            <div class="cert-sub">100+ North American Graduate Programs</div>
+          </div>
+        </div>
+        <div class="cert-item">
+          <div class="cert-icon">&#x2B50;</div>
+          <div>
+            <div class="cert-name">Beta Gamma Sigma Honor Society</div>
+            <div class="cert-sub">Top 10% of MS Finance Students &middot; IIT Stuart</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem;">
+      <p class="section-label reveal">Relevant Coursework</p>
+      <div style="margin-top: 1.25rem;" class="course-tags reveal">
+        <span class="course-tag">Derivatives &amp; Futures/Options</span>
+        <span class="course-tag">Bonds &amp; Fixed Income</span>
+        <span class="course-tag">Portfolio Management</span>
+        <span class="course-tag">Market Risk Analysis</span>
+        <span class="course-tag">Financial Markets &amp; Instruments</span>
+        <span class="course-tag">Financial Modelling</span>
+        <span class="course-tag">Valuation &amp; Transaction Analysis</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="contact-inner">
+      <p class="section-label reveal">Let's Connect</p>
+      <h2 class="section-title reveal">Get In Touch</h2>
+      <div class="divider reveal" style="margin: 0 auto 2rem;"></div>
+      <p class="reveal">
+        Open to quantitative analyst, investment operations, portfolio risk, and derivatives research roles.
+        Feel free to reach out via email or connect on LinkedIn.
+      </p>
+      <div class="contact-links reveal">
+        <a href="mailto:rbhutada@hawk.illinoistech.edu" class="contact-link primary">
+          &#9993; rbhutada@hawk.illinoistech.edu
+        </a>
+        <a href="https://www.linkedin.com/in/ram-bhutada-156695246/" target="_blank" class="contact-link ghost">
+          LinkedIn
+        </a>
+        <a href="https://github.com/rambhutada20" target="_blank" class="contact-link ghost">
+          GitHub
+        </a>
+        <a href="tel:+13129730080" class="contact-link ghost">
+          +1 (312) 973-0080
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2025 Ram Bhutada &middot; Built with purpose &amp; precision &middot; Chicago, IL</p>
+</footer>
+
+<script>
+/* CANVAS PARTICLE NET */
+(function(){
+  var canvas = document.getElementById('canvas-bg');
+  var ctx = canvas.getContext('2d');
+  var W, H, particles = [], mouse = {x: null, y: null};
+  var N = 80, CONN = 140;
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  function Particle() {
+    this.x = Math.random()*W; this.y = Math.random()*H;
+    this.vx = (Math.random()-0.5)*0.4; this.vy = (Math.random()-0.5)*0.4;
+    this.r = Math.random()*1.5+0.5;
+  }
+  Particle.prototype.update = function(){
+    this.x += this.vx; this.y += this.vy;
+    if(this.x<0||this.x>W) this.vx*=-1;
+    if(this.y<0||this.y>H) this.vy*=-1;
+  };
+  for(var i=0;i<N;i++) particles.push(new Particle());
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var grd = ctx.createRadialGradient(W*0.3,H*0.4,0,W*0.3,H*0.4,W*0.6);
+    grd.addColorStop(0,'rgba(107,33,232,0.08)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+    var grd2 = ctx.createRadialGradient(W*0.75,H*0.6,0,W*0.75,H*0.6,W*0.5);
+    grd2.addColorStop(0,'rgba(192,38,211,0.06)'); grd2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = grd2; ctx.fillRect(0,0,W,H);
+
+    particles.forEach(function(p){ p.update(); });
+    for(var i=0;i<N;i++){
+      for(var j=i+1;j<N;j++){
+        var dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<CONN){
+          ctx.beginPath();
+          ctx.strokeStyle='rgba(168,85,247,'+(0.18*(1-d/CONN))+')';
+          ctx.lineWidth=0.5;
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke();
+        }
+      }
+      if(mouse.x){
+        var dx=particles[i].x-mouse.x, dy=particles[i].y-mouse.y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<180){
+          ctx.beginPath();
+          ctx.strokeStyle='rgba(192,38,211,'+(0.4*(1-d/180))+')';
+          ctx.lineWidth=0.8;
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(mouse.x,mouse.y); ctx.stroke();
+        }
+      }
+      ctx.beginPath();
+      ctx.fillStyle='rgba(168,85,247,0.6)';
+      ctx.arc(particles[i].x,particles[i].y,particles[i].r,0,Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* TYPEWRITER */
+(function(){
+  var roles = ['Quantitative Analyst','Portfolio Risk Analyst','Derivatives Researcher','Investment Operations Analyst'];
+  var ri=0, ci=0, del=false;
+  var el = document.getElementById('typewriter');
+  function tick(){
+    var cur = roles[ri];
+    if(!del){ ci++; el.textContent=cur.slice(0,ci);
+      if(ci===cur.length){ del=true; setTimeout(tick,1800); return; }
+      setTimeout(tick,60);
+    } else { ci--; el.textContent=cur.slice(0,ci);
+      if(ci===0){ del=false; ri=(ri+1)%roles.length; setTimeout(tick,300); return; }
+      setTimeout(tick,35);
+    }
+  }
+  tick();
+})();
+
+/* SCROLL REVEAL */
+(function(){
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+})();
+
+/* ACTIVE NAV */
+(function(){
+  var sections = document.querySelectorAll('section[id]');
+  var links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll',function(){
+    var cur='';
+    sections.forEach(function(s){ if(window.scrollY>=s.offsetTop-120) cur=s.id; });
+    links.forEach(function(a){ a.classList.toggle('active',a.getAttribute('href')==='#'+cur); });
+  });
+})();
+</script>
+</body>
+</html>
